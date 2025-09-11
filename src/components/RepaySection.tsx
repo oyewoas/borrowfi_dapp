@@ -87,6 +87,11 @@ const RepaySection: React.FC = () => {
         ...contracts.borrowFi,
         functionName: "repay",
         args: [parsedAmount!],
+      }, {
+        onSuccess: () => {
+          setMessage({ text: "", type: "info" });
+          setAmount("");
+        },
       });
     } catch (err) {
       console.error("Error submitting tx:", err);

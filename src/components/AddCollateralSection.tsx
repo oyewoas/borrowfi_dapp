@@ -73,8 +73,11 @@ const AddCollateralSection: React.FC = () => {
           ...contracts.cltToken,
           functionName: "approve",
           args: [contracts.borrowFi.address, parsedAmount],
+        }, {
+          onSuccess: () => {
+                    setMessage({ text: "Approval successful! Now adding collateral...", type: "info" });
+          },
         });
-        setMessage({ text: "Approval successful! Now adding collateral...", type: "info" });
       }
 
       writeContract({
@@ -82,6 +85,11 @@ const AddCollateralSection: React.FC = () => {
         functionName: "addCollateral",
         args: [parsedAmount!],
         account: connectedAccount!,
+      }, {
+        onSuccess: () => {
+          setMessage({ text: "", type: "info" });
+          setAmount("");
+        },
       });
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });

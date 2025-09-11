@@ -26,6 +26,12 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } =
     useWaitForTransactionReceipt({ hash: txHash });
 
+  React.useEffect(() => {
+    if (isConfirmed) {
+      refetchAllVariables();
+    }
+  }, [isConfirmed, refetchAllVariables]);
+
   const handleApprove = () => {
     if (!connectedAccount) {
       setMessage({ text: "Please connect your wallet.", type: "warning" });
@@ -42,10 +48,17 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
         ...contracts.cltToken,
         functionName: "approve",
         args: [contracts.borrowFi.address, parsedAmount!],
+
+        
+      }, {
+        onSuccess: () => {
+          setMessage((prev) => ({ ...prev, text: "" }));
+          setInputAmount("");
+        }
       });
       setMessage((prev) => ({
         ...prev,
-        text: " ",
+        text: "",
       }));
       refetchAllVariables();
     } catch (err: unknown) {
@@ -81,7 +94,7 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
       {isPending && <Message message="Transaction submitted, waiting for confirmation..." type="info" />}
       {isError && <Message message={`Approval failed: ${getErrorFormatter(error)}`} type="error" />}
       {isTxError && <Message message={`Transaction error: ${getErrorFormatter(txError)}`} type="error" />}
-      {message && <Message message={message.text} type={message.type} />}
+      {message.text && <Message message={message.text} type={message.type} />}
     </section>
   );
 };

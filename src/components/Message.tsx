@@ -21,10 +21,22 @@ const Message: React.FC<MessageProps> = ({
   if (!message) return null;
   return (
     <div
-      className={`w-full px-4 py-2 border rounded-lg shadow-sm text-sm font-medium my-2 transition-all duration-200 ${typeStyles[type]} ${className}`}
+      className={`w-full px-4 py-2 border rounded-lg shadow-sm text-sm font-medium my-2 transition-all duration-200 animate-fade-in-out ${typeStyles[type]} ${className}`}
       role="alert"
     >
       {message}
+
+        <style>{`
+        @keyframes fade-in-out {
+          0% { opacity: 0; transform: translateY(-10px); }
+          10% { opacity: 1; transform: translateY(0); }
+          90% { opacity: 1; transform: translateY(0); }
+          100% { opacity: 0; transform: translateY(-10px); }
+        }
+        .animate-fade-in-out {
+          animation: fade-in-out 3s ease-in-out forwards;
+        }
+      `}</style>
     </div>
   );
 };

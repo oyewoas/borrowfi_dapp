@@ -63,6 +63,11 @@ const WithdrawCollateralSection: React.FC = () => {
         functionName: "withdrawCollateral",
         args: [parsedAmount!],
         account: connectedAccount!,
+      }, {
+        onSuccess: () => {
+          setMessage({ text: "", type: "info" });
+          setAmount("");
+        }
       });
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });
