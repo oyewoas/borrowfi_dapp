@@ -1,4 +1,4 @@
-import { mainnet, sepolia } from "viem/chains";
+import { mainnet, sepolia } from "wagmi/chains";
 import { createConfig, http } from "wagmi";
 
 export const config = createConfig({

@@ -1,103 +1,140 @@
 import React from "react";
-
-import { useAccount, useReadContract } from "wagmi";
-import contracts from "../contracts";
-import { formatEther, zeroAddress } from "viem";
 import {
   BanknotesIcon,
   CurrencyDollarIcon,
-  ChartBarIcon,
-  UserIcon,
+  WalletIcon,
+  BuildingLibraryIcon,
+  ArrowDownCircleIcon,
+  ArrowUpCircleIcon,
+  ScaleIcon,
+  LockClosedIcon,
 } from "@heroicons/react/24/outline";
-// PopoverValue component for displaying full value on click
+import { useStatus } from "../providers/StatusContext";
+
+// 🔹 Popover for long values
 const PopoverValue: React.FC<{ value?: string }> = ({ value }) => {
   if (!value) return null;
-  const truncated = value.length > 8 ? `${value.slice(0, 8)}...` : value;
+  const formatted = value.toString();
+  const truncated =
+    formatted.length > 10 ? `${formatted.slice(0, 10)}...` : formatted;
+
   return (
     <span className="relative group cursor-pointer">
-      <span className="text-gray-900 font-semibold text-lg truncate max-w-[120px] inline-block transition-colors duration-200 group-hover:text-blue-600">
+      <span className="text-gray-900 font-semibold text-sm sm:text-base truncate max-w-[120px] inline-block transition-colors duration-200 group-hover:text-blue-600">
         {truncated}
       </span>
-      <span className="absolute left-1/2 top-full z-10 -translate-x-1/2 mt-2 px-4 py-2 bg-white border border-blue-300 rounded-xl shadow-lg text-sm text-blue-700 font-mono whitespace-nowrap transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none">
-        {value}
+      <span className="absolute left-1/2 top-full z-10 -translate-x-1/2 mt-2 px-3 py-1 bg-white border border-blue-300 rounded-xl shadow-lg text-xs sm:text-sm text-blue-700 font-mono whitespace-nowrap transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none">
+        {formatted}
       </span>
     </span>
   );
 };
+
+// 🔹 Card Item
+const StatusItem: React.FC<{
+  label: string;
+  value?: string;
+  icon: React.ReactNode;
+  bg: string;
+}> = ({ label, value, icon, bg }) => (
+  <div
+    className={`${bg} rounded-lg p-3 flex justify-between items-center transition hover:shadow-md`}
+  >
+    <div className="flex items-center gap-2">
+      <span className="text-gray-600 w-5 h-5">{icon}</span>
+      <span className="font-medium text-gray-700 text-sm sm:text-base">
+        {label}
+      </span>
+    </div>
+    <PopoverValue value={value} />
+  </div>
+);
+
 const StatusSection: React.FC = () => {
-  const { address: connectedAccount } = useAccount();
-  const { data: collateral } = useReadContract({
-    ...contracts.borrowFi,
-    functionName: "collateralOf",
-    args: [connectedAccount ?? zeroAddress],
-  });
-  const { data: loan } = useReadContract({
-    ...contracts.borrowFi,
-    functionName: "loanOf",
-    args: [connectedAccount ?? zeroAddress],
-  });
-  const { data: totalCollateral } = useReadContract({
-    ...contracts.borrowFi,
-    functionName: "totalCollateral",
-  });
-  const { data: totalBorrowed } = useReadContract({
-    ...contracts.borrowFi,
-    functionName: "totalBorrowed",
-  });
-  const loading =
-    collateral === undefined ||
-    loan === undefined ||
-    totalCollateral === undefined ||
-    totalBorrowed === undefined;
+  // Read contract data
+  const {
+    collateral,
+    loan,
+    userCLT,
+    userBFI,
+    availableBorrow,
+    availableCLT,
+    totalBorrowed,
+    cltAllowance,
+    totalCollateral,
+    loading,
+  } = useStatus();
 
   return (
-    <section className="bg-white rounded-2xl shadow-lg p-8 min-w-[300px] max-w-3xl w-full flex-1 mb-4 transition-transform hover:scale-[1.02] hover:shadow-xl">
-      <h2 className="text-2xl font-bold mb-6 text-blue-700 flex items-center gap-2">
-        <ChartBarIcon className="w-6 h-6 text-blue-500" /> Status
+    <section className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 w-full flex-1 mb-6 transition-transform hover:scale-[1.01] hover:shadow-xl">
+      <h2 className="text-xl sm:text-2xl font-bold mb-6 text-blue-700">
+        Status
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-blue-50 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2 sm:mb-0">
-            <BanknotesIcon className="w-5 h-5 text-blue-400" />
-            <span className="font-medium text-gray-700">Your Collateral</span>
-          </div>
-          <span className="text-gray-900 font-semibold text-lg">
-            {formatEther(BigInt(collateral ?? 0))}
-          </span>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-green-50 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2 sm:mb-0">
-            <CurrencyDollarIcon className="w-5 h-5 text-green-400" />
-            <span className="font-medium text-gray-700">Your Loan</span>
-          </div>
-          <span className="text-gray-900 font-semibold text-lg">
-            {formatEther(BigInt(loan ?? 0))}
-          </span>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-purple-50 rounded-lg p-3 group cursor-pointer">
-          <div className="flex items-center gap-2 mb-2 sm:mb-0">
-            <UserIcon className="w-5 h-5 text-purple-400" />
-            <span className="font-medium text-gray-700">Total Collateral</span>
-          </div>
-          <span className="relative">
-            <span className="text-gray-900 font-semibold text-lg truncate max-w-[120px] inline-block transition-colors duration-200 group-hover:text-blue-600">
-              {formatEther(BigInt(totalCollateral ?? 0)).length > 8
-                ? `${formatEther(BigInt(totalCollateral ?? 0)).slice(0, 8)}...`
-                : formatEther(BigInt(totalCollateral ?? 0))}
-            </span>
-            <span className="absolute left-1/2 top-full z-10 -translate-x-1/2 mt-2 px-4 py-2 bg-white border border-blue-300 rounded-xl shadow-lg text-sm text-blue-700 font-mono whitespace-nowrap transition-all duration-200 opacity-0 group-hover:opacity-100 pointer-events-none">
-              {formatEther(BigInt(totalCollateral ?? 0))}
-            </span>
-          </span>
-        </div>
-        <div className="flex flex-col sm:flex-row items-center justify-between bg-red-50 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2 sm:mb-0">
-            <CurrencyDollarIcon className="w-5 h-5 text-red-400" />
-            <span className="font-medium text-gray-700">Total Borrowed</span>
-          </div>
-          <PopoverValue value={formatEther(BigInt(totalBorrowed ?? 0))} />
-        </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {/* User balances */}
+        <StatusItem
+          label="Your Collateral"
+          value={collateral}
+          icon={<CurrencyDollarIcon />}
+          bg="bg-blue-50"
+        />
+        <StatusItem
+          label="Your Loan"
+          value={loan}
+          icon={<BanknotesIcon />}
+          bg="bg-green-50"
+        />
+        <StatusItem
+          label="Your CLT Balance"
+          value={userCLT}
+          icon={<WalletIcon />}
+          bg="bg-purple-50"
+        />
+        <StatusItem
+          label="Your BFI Balance"
+          value={userBFI}
+          icon={<BuildingLibraryIcon />}
+          bg="bg-yellow-50"
+        />
+
+        {/* Pool balances */}
+        <StatusItem
+          label="Available Borrow"
+          value={availableBorrow}
+          icon={<ArrowDownCircleIcon />}
+          bg="bg-gray-50"
+        />
+        <StatusItem
+          label="Available CLT"
+          value={availableCLT}
+          icon={<ArrowUpCircleIcon />}
+          bg="bg-gray-50"
+        />
+
+        {/* Totals */}
+        <StatusItem
+          label="Total Borrowed"
+          value={totalBorrowed}
+          icon={<BanknotesIcon />}
+          bg="bg-red-50"
+        />
+
+        {/* Allowance */}
+        <StatusItem
+          label="CLT Allowance"
+          value={cltAllowance}
+          icon={<LockClosedIcon />}
+          bg="bg-orange-50"
+        />
+        <StatusItem
+          label="Total Collateral"
+          value={totalCollateral}
+          icon={<ScaleIcon />}
+          bg="bg-red-50 col-span-1 sm:col-span-2 lg:col-span-3"
+        />
       </div>
+
       {loading && (
         <div className="mt-4 text-blue-500 animate-pulse">Loading...</div>
       )}

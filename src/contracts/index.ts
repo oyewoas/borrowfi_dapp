@@ -11,7 +11,8 @@ type TContracts = Record<
 
 const contracts = {
   borrowFi: {
-    address: "0x31c14fcbD235bf3617EcA5a3A548f7F000d61eC0",
+    // address: "0x31c14fcbD235bf3617EcA5a3A548f7F000d61eC0",
+    address: "0x306b3300A32C023d13D0846DD6Ffb4f5dfa89643",
     abi: borrowFiAbi,
   },
   cltToken: {
