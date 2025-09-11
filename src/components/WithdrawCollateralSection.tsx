@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAccount,
   useWriteContract,
@@ -7,14 +7,16 @@ import {
 } from "wagmi";
 import { simulateContract } from "@wagmi/core";
 import { parseEther } from "viem";
-import { config } from "../config";
+import { config, webSocketConfig } from "../config";
 import contracts from "../contracts";
 import Message from "./Message";
 import { getErrorFormatter } from "../utils/getErrorFormatter";
+import { useStatus } from "../providers/StatusContext";
 
 const WithdrawCollateralSection: React.FC = () => {
   const [amount, setAmount] = useState("");
   const { address: connectedAccount } = useAccount();
+  const { cltAllowance, refetchAllVariables } = useStatus();
   const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error" | "warning" }>({ text: "", type: "info" });
 
   const parsedAmount = amount ? parseEther(amount) : BigInt(0);
@@ -22,9 +24,15 @@ const WithdrawCollateralSection: React.FC = () => {
 
   const { writeContract, data: txHash, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } = useWaitForTransactionReceipt({ hash: txHash });
-
+useEffect(() => {
+  if (isConfirmed) {
+    refetchAllVariables();
+    setAmount("");
+  }
+}, [isConfirmed, refetchAllVariables]);
   // Watch withdraw collateral event
   useWatchContractEvent({
+    config: webSocketConfig,
     ...contracts.borrowFi,
     eventName: "CollateralWithdrawn",
     onLogs: () => setMessage({ text: "Collateral withdrawn on-chain!", type: "success" }),
@@ -37,6 +45,11 @@ const WithdrawCollateralSection: React.FC = () => {
     }
     if (!connectedAccount) {
       setMessage({ text: "Connect your wallet first.", type: "warning" });
+      return;
+    }
+    if (parsedAmount && parsedAmount > parseEther(cltAllowance)) {
+      console.log(parsedAmount, parseEther(cltAllowance));
+      setMessage({ text: "Parsed amount exceeds CLT allowance.", type: "warning" });
       return;
     }
 
@@ -58,6 +71,18 @@ const WithdrawCollateralSection: React.FC = () => {
 
     try {
       // Submit the simulated withdraw transaction
+      if(!isValidAmount) {
+        setMessage({ text: "Enter a valid amount greater than 0.", type: "warning" });
+        return;
+      }
+      if(!connectedAccount) {
+        setMessage({ text: "Connect your wallet first.", type: "warning" });
+        return;
+      }
+      if(parsedAmount && parsedAmount > parseEther(cltAllowance)) {
+        setMessage({ text: "Parsed amount exceeds CLT allowance.", type: "warning" });
+        return;
+      }
       writeContract({
         ...contracts.borrowFi,
         functionName: "withdrawCollateral",
@@ -66,7 +91,6 @@ const WithdrawCollateralSection: React.FC = () => {
       }, {
         onSuccess: () => {
           setMessage({ text: "", type: "info" });
-          setAmount("");
         }
       });
     } catch (err: unknown) {

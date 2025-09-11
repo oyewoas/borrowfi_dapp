@@ -22,10 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-.env
-.env.test
 .env.*.local
-.env.local
 coverage
 .cache
 .next
@@ -59,3 +56,4 @@ __sapper____
 .sass-cache
 bower_components
 jspm_packages
+config.bat

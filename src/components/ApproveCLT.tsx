@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAccount, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
 import contracts from "../contracts";
 import { parseEther } from "viem";
@@ -26,9 +26,10 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } =
     useWaitForTransactionReceipt({ hash: txHash });
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isConfirmed) {
       refetchAllVariables();
+      setInputAmount("");
     }
   }, [isConfirmed, refetchAllVariables]);
 
@@ -53,10 +54,8 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
       }, {
         onSuccess: () => {
           setMessage((prev) => ({ ...prev, text: "" }));
-          setInputAmount("");
         }
       });
-      refetchAllVariables();
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });
     }

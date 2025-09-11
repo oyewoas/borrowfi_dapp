@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAccount,
   useWriteContract,
@@ -7,7 +7,7 @@ import {
 } from "wagmi";
 import { simulateContract } from "@wagmi/core";
 import { parseEther } from "viem";
-import { config } from "../config";
+import { config, webSocketConfig } from "../config";
 import contracts from "../contracts";
 import { useStatus } from "../providers/StatusContext";
 import Message from "./Message";
@@ -16,7 +16,7 @@ import { getErrorFormatter } from "../utils/getErrorFormatter";
 const AddCollateralSection: React.FC = () => {
   const [amount, setAmount] = useState("");
   const { address: connectedAccount } = useAccount();
-  const { cltAllowance } = useStatus();
+  const { cltAllowance, refetchAllVariables } = useStatus();
   const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error" | "warning" }>({ text: "", type: "info" });
 
   const parsedAmount = amount ? parseEther(amount) : BigInt(0);
@@ -24,9 +24,15 @@ const AddCollateralSection: React.FC = () => {
 
   const { writeContract, data: txHash, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } = useWaitForTransactionReceipt({ hash: txHash });
-
+useEffect(() => {
+  if (isConfirmed) {
+    refetchAllVariables();
+    setAmount("");
+  }
+}, [isConfirmed, refetchAllVariables]);
   // Watch add collateral event
   useWatchContractEvent({
+    config: webSocketConfig,
     ...contracts.borrowFi,
     eventName: "CollateralAdded",
     onLogs: () => setMessage({ text: "Collateral added on-chain!", type: "success" }),
@@ -86,10 +92,11 @@ const AddCollateralSection: React.FC = () => {
         args: [parsedAmount],
         account: connectedAccount,
       }, {
-        onSettled: () => {
+        onSuccess: () => {
           setMessage({ text: "", type: "info" });
           },
       });
+
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });
     }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAccount,
   useWriteContract,
@@ -7,14 +7,16 @@ import {
 } from "wagmi";
 import { simulateContract } from "@wagmi/core";
 import { parseEther } from "viem";
-import { config } from "../config"; // wagmi config
+import { config, webSocketConfig } from "../config"; // wagmi config
 import contracts from "../contracts";
 import Message from "./Message";
 import { getErrorFormatter } from "../utils/getErrorFormatter";
+import { useStatus } from "../providers/StatusContext";
 
 const RepaySection: React.FC = () => {
   const [amount, setAmount] = useState("");
   const { address: connectedAccount } = useAccount();
+  const { refetchAllVariables } = useStatus();
   const [message, setMessage] = useState<{
     text: string;
     type: "info" | "success" | "error" | "warning";
@@ -39,10 +41,16 @@ const RepaySection: React.FC = () => {
     isError: isTxError,
     error: txError,
   } = useWaitForTransactionReceipt({ hash: txHash });
-
+useEffect(() => {
+  if (isConfirmed) {
+    refetchAllVariables();
+    setAmount("");
+  }
+}, [isConfirmed, refetchAllVariables]);
   // Watch Repay events
   useWatchContractEvent({
     ...contracts.borrowFi,
+    config: webSocketConfig,
     eventName: "Repaid",
     onLogs: () => {
       setMessage({ text: "Repay successful! Event detected on-chain.", type: "success" });

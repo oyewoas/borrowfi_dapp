@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   useAccount,
   useWriteContract,
@@ -7,14 +7,16 @@ import {
 } from "wagmi";
 import { simulateContract } from "@wagmi/core";
 import { parseEther } from "viem";
-import { config } from "../config"; // wagmi config
+import { config, webSocketConfig } from "../config"; // wagmi config
 import contracts from "../contracts";
 import Message from "./Message";
 import { getErrorFormatter } from "../utils/getErrorFormatter";
+import { useStatus } from "../providers/StatusContext";
 
 const BorrowSection: React.FC = () => {
   const [amount, setAmount] = useState("");
   const { address: connectedAccount } = useAccount();
+  const { refetchAllVariables } = useStatus();
   const [message, setMessage] = useState<{
     text: string;
     type: "info" | "success" | "error" | "warning";
@@ -44,10 +46,16 @@ const BorrowSection: React.FC = () => {
   } = useWaitForTransactionReceipt({
     hash: txHash,
   });
-
+useEffect(() => {
+  if (isConfirmed) {
+    refetchAllVariables();
+    setAmount("");
+  }
+}, [isConfirmed, refetchAllVariables]);
   // Watch Borrow events
   useWatchContractEvent({
     ...contracts.borrowFi,
+    config: webSocketConfig,
     eventName: "Borrowed",
     onLogs: () => {
       setMessage({
@@ -111,6 +119,7 @@ const BorrowSection: React.FC = () => {
         functionName: "borrow",
         args: [parsedAmount!],
       });
+      
     } catch (err) {
       console.error("Error submitting tx:", err);
       setMessage({
