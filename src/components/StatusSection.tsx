@@ -62,6 +62,7 @@ const StatusSection: React.FC = () => {
     totalBorrowed,
     cltAllowance,
     totalCollateral,
+    userLTC,
     loading,
   } = useStatus();
 
@@ -92,6 +93,13 @@ const StatusSection: React.FC = () => {
           bg="bg-purple-50"
         />
         <StatusItem
+          label="Your LTC Balance"
+          value={userLTC?.toString()}
+          icon={<ScaleIcon />}
+          bg="bg-gray-50"
+        />
+
+        <StatusItem
           label="Your BFI Balance"
           value={userBFI?.toString()}
           icon={<BuildingLibraryIcon />}
@@ -111,7 +119,7 @@ const StatusSection: React.FC = () => {
           icon={<ArrowUpCircleIcon />}
           bg="bg-gray-50"
         />
-
+       
         {/* Totals */}
         <StatusItem
           label="Total Borrowed"
@@ -131,7 +139,7 @@ const StatusSection: React.FC = () => {
           label="Total Collateral"
           value={totalCollateral?.toString()}
           icon={<ScaleIcon />}
-          bg="bg-red-50 col-span-1 sm:col-span-2 lg:col-span-3"
+          bg="bg-red-50 lg:col-span-3"
         />
       </div>
 
