@@ -19,7 +19,7 @@ const AddCollateralSection: React.FC = () => {
   const { cltAllowance } = useStatus();
   const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error" | "warning" }>({ text: "", type: "info" });
 
-  const parsedAmount = amount ? parseEther(amount) : undefined;
+  const parsedAmount = amount ? parseEther(amount) : BigInt(0);
   const isValidAmount = amount && !isNaN(Number(amount)) && Number(amount) > 0;
 
   const { writeContract, data: txHash, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
@@ -51,10 +51,11 @@ const AddCollateralSection: React.FC = () => {
 
     try {
       setMessage({ text: "Simulating addCollateral...", type: "info" });
+      console.log("Simulating addCollateral with args:", [parsedAmount]);
       await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "addCollateral",
-        args: [parsedAmount!],
+        args: [parsedAmount],
         account: connectedAccount,
       });
       setMessage({ text: "Simulation successful! Ready to submit transaction.", type: "success" });
@@ -83,13 +84,12 @@ const AddCollateralSection: React.FC = () => {
       writeContract({
         ...contracts.borrowFi,
         functionName: "addCollateral",
-        args: [parsedAmount!],
-        account: connectedAccount!,
+        args: [parsedAmount],
+        account: connectedAccount,
       }, {
-        onSuccess: () => {
+        onSettled: () => {
           setMessage({ text: "", type: "info" });
-          setAmount("");
-        },
+          },
       });
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });

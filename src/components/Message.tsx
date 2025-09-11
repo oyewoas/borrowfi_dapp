@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 
 interface MessageProps {
   message?: string;
@@ -13,30 +13,24 @@ const typeStyles: Record<string, string> = {
   warning: "bg-yellow-50 border-yellow-400 text-yellow-700",
 };
 
-const Message: React.FC<MessageProps> = ({
-  message,
-  type = "info",
-  className = "",
-}) => {
-  if (!message) return null;
+const Message: React.FC<MessageProps> = ({ message, type = "info", className = "" }) => {
+  const [visible, setVisible] = useState(true);
+
+  if (!message || !visible) return null;
+
   return (
     <div
-      className={`w-full px-4 py-2 border rounded-lg shadow-sm text-sm font-medium my-2 transition-all duration-200 animate-fade-in-out ${typeStyles[type]} ${className}`}
+      className={`w-full px-4 py-2 border rounded-lg shadow-sm text-sm font-medium my-2 flex justify-between items-start ${typeStyles[type]} ${className}`}
       role="alert"
     >
-      {message}
-
-        <style>{`
-        @keyframes fade-in-out {
-          0% { opacity: 0; transform: translateY(-10px); }
-          10% { opacity: 1; transform: translateY(0); }
-          90% { opacity: 1; transform: translateY(0); }
-          100% { opacity: 0; transform: translateY(-10px); }
-        }
-        .animate-fade-in-out {
-          animation: fade-in-out 3s ease-in-out forwards;
-        }
-      `}</style>
+<span className="whitespace-pre-wrap break-words">{message}</span>
+      <button
+        onClick={() => setVisible(false)}
+        className="ml-4 text-gray-500 hover:text-gray-700 font-bold flex-shrink-0"
+        aria-label="Clear message"
+      >
+        ✕
+      </button>
     </div>
   );
 };

@@ -56,10 +56,6 @@ const ApproveCLT: React.FC<ApproveCLTProps> = ({ amount }) => {
           setInputAmount("");
         }
       });
-      setMessage((prev) => ({
-        ...prev,
-        text: "",
-      }));
       refetchAllVariables();
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });

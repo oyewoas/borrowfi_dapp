@@ -17,7 +17,7 @@ const WithdrawCollateralSection: React.FC = () => {
   const { address: connectedAccount } = useAccount();
   const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error" | "warning" }>({ text: "", type: "info" });
 
-  const parsedAmount = amount ? parseEther(amount) : undefined;
+  const parsedAmount = amount ? parseEther(amount) : BigInt(0);
   const isValidAmount = amount && !isNaN(Number(amount)) && Number(amount) > 0;
 
   const { writeContract, data: txHash, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
@@ -45,7 +45,7 @@ const WithdrawCollateralSection: React.FC = () => {
       await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "withdrawCollateral",
-        args: [parsedAmount!],
+        args: [parsedAmount],
         account: connectedAccount,
       });
       setMessage({ text: "Simulation successful! Ready to submit transaction.", type: "success" });

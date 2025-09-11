@@ -51,7 +51,6 @@ export const StatusProvider: React.FC<{ children: ReactNode }> = ({ children }) 
   const { data: cltAllowance, refetch: refetchCltAllowance } = useReadContract({
     ...contracts.cltToken,
     functionName: "allowance",
-    
     args: [connectedAccount ?? zeroAddress, contracts.borrowFi.address],
   });
 const {data: userLTC, refetch: refetchUserLTC} = useReadContract({
