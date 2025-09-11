@@ -75,25 +75,25 @@ const StatusSection: React.FC = () => {
         {/* User balances */}
         <StatusItem
           label="Your Collateral"
-          value={collateral}
+          value={collateral?.toString()}
           icon={<CurrencyDollarIcon />}
           bg="bg-blue-50"
         />
         <StatusItem
           label="Your Loan"
-          value={loan}
+          value={loan?.toString()}
           icon={<BanknotesIcon />}
           bg="bg-green-50"
         />
         <StatusItem
           label="Your CLT Balance"
-          value={userCLT}
+          value={userCLT?.toString()}
           icon={<WalletIcon />}
           bg="bg-purple-50"
         />
         <StatusItem
           label="Your BFI Balance"
-          value={userBFI}
+          value={userBFI?.toString()}
           icon={<BuildingLibraryIcon />}
           bg="bg-yellow-50"
         />
@@ -101,13 +101,13 @@ const StatusSection: React.FC = () => {
         {/* Pool balances */}
         <StatusItem
           label="Available Borrow"
-          value={availableBorrow}
+          value={availableBorrow?.toString()}
           icon={<ArrowDownCircleIcon />}
           bg="bg-gray-50"
         />
         <StatusItem
           label="Available CLT"
-          value={availableCLT}
+          value={availableCLT?.toString()}
           icon={<ArrowUpCircleIcon />}
           bg="bg-gray-50"
         />
@@ -115,7 +115,7 @@ const StatusSection: React.FC = () => {
         {/* Totals */}
         <StatusItem
           label="Total Borrowed"
-          value={totalBorrowed}
+          value={totalBorrowed?.toString()}
           icon={<BanknotesIcon />}
           bg="bg-red-50"
         />
@@ -123,13 +123,13 @@ const StatusSection: React.FC = () => {
         {/* Allowance */}
         <StatusItem
           label="CLT Allowance"
-          value={cltAllowance}
+          value={cltAllowance?.toString()}
           icon={<LockClosedIcon />}
           bg="bg-orange-50"
         />
         <StatusItem
           label="Total Collateral"
-          value={totalCollateral}
+          value={totalCollateral?.toString()}
           icon={<ScaleIcon />}
           bg="bg-red-50 col-span-1 sm:col-span-2 lg:col-span-3"
         />
