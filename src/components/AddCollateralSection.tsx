@@ -51,7 +51,6 @@ const AddCollateralSection: React.FC = () => {
 
     try {
       setMessage({ text: "Simulating addCollateral...", type: "info" });
-      console.log("Simulating addCollateral with args:", [parsedAmount]);
       await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "addCollateral",
