@@ -22,8 +22,6 @@ const AddCollateralSection: React.FC = () => {
   const parsedAmount = amount ? parseEther(amount) : undefined;
   const isValidAmount = amount && !isNaN(Number(amount)) && Number(amount) > 0;
 
-  const [simulateRequest, setSimulateRequest] = useState<unknown>(null);
-
   const { writeContract, data: txHash, isPending: isWritePending, isError: isWriteError, error: writeError } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed, isError: isTxError, error: txError } = useWaitForTransactionReceipt({ hash: txHash });
 
@@ -53,13 +51,12 @@ const AddCollateralSection: React.FC = () => {
 
     try {
       setMessage({ text: "Simulating addCollateral...", type: "info" });
-      const result = await simulateContract(config, {
+      await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "addCollateral",
         args: [parsedAmount!],
         account: connectedAccount,
       });
-      setSimulateRequest(result.request);
       setMessage({ text: "Simulation successful! Ready to submit transaction.", type: "success" });
     } catch (err: unknown) {
       setMessage({ text: `Simulation failed: ${getErrorFormatter(err)}`, type: "error" });
@@ -80,7 +77,12 @@ const AddCollateralSection: React.FC = () => {
         setMessage({ text: "Approval successful! Now adding collateral...", type: "info" });
       }
 
-      writeContract(simulateRequest);
+      writeContract({
+        ...contracts.borrowFi,
+        functionName: "addCollateral",
+        args: [parsedAmount!],
+        account: connectedAccount!,
+      });
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });
     }
@@ -110,7 +112,7 @@ const AddCollateralSection: React.FC = () => {
 
         <button
           onClick={handleAdd}
-          disabled={!simulateRequest || isWritePending || isConfirming}
+          disabled={!isValidAmount || isWritePending || isConfirming}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400 flex-1"
         >
           

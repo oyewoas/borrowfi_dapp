@@ -15,7 +15,6 @@ import { getErrorFormatter } from "../utils/getErrorFormatter";
 const WithdrawCollateralSection: React.FC = () => {
   const [amount, setAmount] = useState("");
   const { address: connectedAccount } = useAccount();
-  const [simulateRequest, setSimulateRequest] = useState<unknown>(null);
   const [message, setMessage] = useState<{ text: string; type: "info" | "success" | "error" | "warning" }>({ text: "", type: "info" });
 
   const parsedAmount = amount ? parseEther(amount) : undefined;
@@ -43,13 +42,12 @@ const WithdrawCollateralSection: React.FC = () => {
 
     try {
       setMessage({ text: "Simulating withdrawCollateral...", type: "info" });
-      const result = await simulateContract(config, {
+      await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "withdrawCollateral",
         args: [parsedAmount!],
         account: connectedAccount,
       });
-      setSimulateRequest(result.request);
       setMessage({ text: "Simulation successful! Ready to submit transaction.", type: "success" });
     } catch (err: unknown) {
       setMessage({ text: `Simulation failed: ${getErrorFormatter(err)}`, type: "error" });
@@ -57,15 +55,15 @@ const WithdrawCollateralSection: React.FC = () => {
   };
 
   const handleWithdraw = async () => {
-    if (!simulateRequest) {
-      setMessage({ text: "Simulate first before withdrawing collateral.", type: "warning" });
-     
-      return;
-    }
 
     try {
       // Submit the simulated withdraw transaction
-      writeContract(simulateRequest);
+      writeContract({
+        ...contracts.borrowFi,
+        functionName: "withdrawCollateral",
+        args: [parsedAmount!],
+        account: connectedAccount!,
+      });
     } catch (err: unknown) {
       setMessage({ text: getErrorFormatter(err), type: "error" });
     }
@@ -97,7 +95,7 @@ const WithdrawCollateralSection: React.FC = () => {
 
         <button
           onClick={handleWithdraw}
-          disabled={!simulateRequest || isWritePending || isConfirming}
+          disabled={!isValidAmount || isWritePending || isConfirming}
           className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed border border-blue-400 flex-1"
         >
 
