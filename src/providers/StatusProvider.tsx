@@ -78,16 +78,16 @@ const {data: userLTC, refetch: refetchUserLTC} = useReadContract({
     totalCollateral === undefined ||
     totalBorrowed === undefined;
   const value: StatusContextType = {
-    collateral: formatEther(BigInt(collateral ?? 0)),
-    loan: formatEther(BigInt(loan ?? 0)),
-    totalCollateral: formatEther(BigInt(totalCollateral ?? 0)),
-    totalBorrowed: formatEther(BigInt(totalBorrowed ?? 0)),
-    userCLT: formatEther(BigInt(userCLT ?? 0)),
-    userBFI: formatEther(BigInt(userBFI ?? 0)),
-    availableBorrow: formatEther(BigInt(availableBorrow ?? 0)),
-    availableCLT: formatEther(BigInt(availableCLT ?? 0)),
-    cltAllowance: formatEther(BigInt(cltAllowance ?? 0)),
-    userLTC: formatEther(BigInt(userLTC ?? 0)),
+    collateral: formatEther(collateral ?? BigInt(0)),
+    loan: formatEther(loan ?? BigInt(0)),
+    totalCollateral: formatEther(totalCollateral ?? BigInt(0)),
+    totalBorrowed: formatEther(totalBorrowed ?? BigInt(0)),
+    userCLT: formatEther(userCLT ?? BigInt(0)),
+    userBFI: formatEther(userBFI ?? BigInt(0)),
+    availableBorrow: formatEther(availableBorrow ?? BigInt(0)),
+    availableCLT: formatEther(availableCLT ?? BigInt(0)),
+    cltAllowance: formatEther(cltAllowance ?? BigInt(0)),
+    userLTC: formatEther(userLTC ?? BigInt(0)),
     refetchAllVariables,
     loading,
   };

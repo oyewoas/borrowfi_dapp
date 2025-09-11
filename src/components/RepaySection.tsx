@@ -20,8 +20,6 @@ const RepaySection: React.FC = () => {
     type: "info" | "success" | "error" | "warning";
   }>({ text: "", type: "info" });
 
-  const [simulateRequest, setSimulateRequest] = useState<unknown>(null);
-
   const parsedAmount = amount ? parseEther(amount) : undefined;
   const isValidAmount = amount && !isNaN(Number(amount)) && Number(amount) > 0;
 
@@ -64,19 +62,17 @@ const RepaySection: React.FC = () => {
 
     try {
       setMessage({ text: "Running simulation...", type: "info" });
-      const result = await simulateContract(config, {
+      await simulateContract(config, {
         ...contracts.borrowFi,
         functionName: "repay",
         args: [parsedAmount!],
         account: connectedAccount,
       });
 
-      setSimulateRequest(result.request);
       setMessage({ text: "Simulation successful! Transaction looks valid.", type: "success" });
     } catch (err: unknown) {
       console.error("Simulation failed:", err);
-      setSimulateRequest(null);
-      setMessage({
+        setMessage({
         text: `Simulation failed: ${(getErrorFormatter(err))}`,
         type: "error",
       });
