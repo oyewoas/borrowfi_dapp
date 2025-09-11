@@ -1,16 +1,16 @@
 import { createContext, useContext } from "react";
 
 export type StatusContextType = {
-  collateral: bigint;
-  loan: bigint;
-  totalCollateral: bigint;
-  totalBorrowed: bigint;
-  userCLT: bigint;
-  userLTC: bigint;
-  userBFI: bigint;
-  availableBorrow: bigint;
-  availableCLT: bigint;
-  cltAllowance: bigint;
+  collateral: string;
+  loan: string;
+  totalCollateral: string;
+  totalBorrowed: string;
+  userCLT: string;
+  userLTC: string;
+  userBFI: string;
+  availableBorrow: string;
+  availableCLT: string;
+  cltAllowance: string;
   loading: boolean;
     refetchAllVariables: () => Promise<void>;
 };

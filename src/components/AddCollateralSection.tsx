@@ -44,7 +44,7 @@ const AddCollateralSection: React.FC = () => {
     }
 
     // Check allowance
-    if (parsedAmount && parsedAmount > cltAllowance) {
+    if (parsedAmount && parsedAmount > parseEther(cltAllowance)) {
       setMessage({ text: "Approve CLT tokens first.", type: "warning" });
       return;
     }
@@ -67,7 +67,7 @@ const AddCollateralSection: React.FC = () => {
 
     try {
       // Approve CLT if needed
-      if (parsedAmount && parsedAmount > cltAllowance) {
+      if (parsedAmount && parsedAmount > parseEther(cltAllowance)) {
         setMessage({ text: "Approving CLT spend...", type: "info" });
          writeContract({
           ...contracts.cltToken,

@@ -11,7 +11,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { useStatus } from "../providers/StatusContext";
 
-// 🔹 Popover for long values
+// Popover for long values
 const PopoverValue: React.FC<{ value?: string }> = ({ value }) => {
   if (!value) return null;
   const formatted = value.toString();
@@ -76,32 +76,32 @@ const StatusSection: React.FC = () => {
         {/* User balances */}
         <StatusItem
           label="Your Collateral"
-          value={collateral?.toString()}
+          value={collateral}
           icon={<CurrencyDollarIcon />}
           bg="bg-blue-50"
         />
         <StatusItem
           label="Your Loan"
-          value={loan?.toString()}
+          value={loan}
           icon={<BanknotesIcon />}
           bg="bg-green-50"
         />
         <StatusItem
           label="Your CLT Balance"
-          value={userCLT?.toString()}
+          value={userCLT}
           icon={<WalletIcon />}
           bg="bg-purple-50"
         />
         <StatusItem
           label="Your LTC Balance"
-          value={userLTC?.toString()}
+          value={userLTC}
           icon={<ScaleIcon />}
           bg="bg-gray-50"
         />
 
         <StatusItem
           label="Your BFI Balance"
-          value={userBFI?.toString()}
+          value={userBFI}
           icon={<BuildingLibraryIcon />}
           bg="bg-yellow-50"
         />
@@ -109,13 +109,13 @@ const StatusSection: React.FC = () => {
         {/* Pool balances */}
         <StatusItem
           label="Available Borrow"
-          value={availableBorrow?.toString()}
+          value={availableBorrow}
           icon={<ArrowDownCircleIcon />}
           bg="bg-gray-50"
         />
         <StatusItem
           label="Available CLT"
-          value={availableCLT?.toString()}
+          value={availableCLT}
           icon={<ArrowUpCircleIcon />}
           bg="bg-gray-50"
         />
@@ -123,7 +123,7 @@ const StatusSection: React.FC = () => {
         {/* Totals */}
         <StatusItem
           label="Total Borrowed"
-          value={totalBorrowed?.toString()}
+          value={totalBorrowed}
           icon={<BanknotesIcon />}
           bg="bg-red-50"
         />
@@ -131,13 +131,13 @@ const StatusSection: React.FC = () => {
         {/* Allowance */}
         <StatusItem
           label="CLT Allowance"
-          value={cltAllowance?.toString()}
+          value={cltAllowance}
           icon={<LockClosedIcon />}
           bg="bg-orange-50"
         />
         <StatusItem
           label="Total Collateral"
-          value={totalCollateral?.toString()}
+          value={totalCollateral}
           icon={<ScaleIcon />}
           bg="bg-red-50 lg:col-span-3"
         />
